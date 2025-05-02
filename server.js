@@ -1,5 +1,5 @@
 const express = require('express');
-const fetch = require('node-fetch');
+const fetch = require('node-fetch'); // make sure you're using node-fetch v2
 const cors = require('cors');
 
 const app = express();
@@ -29,10 +29,15 @@ app.post('/proxy', async (req, res) => {
 
         console.log('✅ Upstream API response:', data);
 
+        if (!upstreamResponse.ok) {
+            console.error('❌ Upstream error response:', data);
+            return res.status(upstreamResponse.status).json(data);
+        }
+
         res.json(data);
     } catch (error) {
-        console.error('❌ Proxy error:', error);
-        res.status(500).json({ error: 'Proxy server error' });
+        console.error('❌ Proxy caught error:', error);
+        res.status(500).json({ error: error.message || 'Proxy server error' });
     }
 });
 
